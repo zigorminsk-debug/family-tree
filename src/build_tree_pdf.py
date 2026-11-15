@@ -212,7 +212,7 @@ def draw_page_background(c, w, h, page_num=None, total_pages=TOTAL_PAGES, header
         c.line(34, 38, w - 34, 38)
         c.setFont("PTSans-Regular", 7.8)
         c.setFillColor(INK_SOFT)
-        c.drawString(34, 28, "Семейный генеалогический альбом · Минская и Смоленская области · Архив ЦАМО")
+        c.drawString(34, 28, "Семейный генеалогический альбом · Минская и Смоленская обл. · НИАБ, ГАМн, ГАСО, ЦАМО")
         c.drawRightString(w - 34, 28, f"Страница {page_num} из {total_pages}")
 
 
@@ -387,8 +387,8 @@ def build_page_1_cover(c, data):
         "Стр. 4 — Поколение II (ветвь Бунель — Винничек) и Поколение III (линия отца и Маруновых)",
         "Стр. 5 — Поколение III (4 брата Бунель, Адамович) и Поколение IV (Бунель Александр и зацепки)",
         "Стр. 6 — Полный сводный реестр альбома (26 строк) и историко-географическая панорама",
-        "Стр. 7 — Итоги поиска в «Вахте памяти» и ЦАМО: найденные дела В. А. Бунеля и М. П. Захаревича",
-        "Стр. 8 — Вопросы к родным, архивный путеводитель (РБ, Польша, Смоленск) и рабочая анкета",
+        "Стр. 7 — Итоги поиска в ЦАМО, ПМВ (1914.svrt.ru) и аудит ЗАГС / метрических / камеральных баз",
+        "Стр. 8 — Вопросы к родным, точные фонды НИАБ / ГАМн / ГАСО / ЗАГС и рабочая анкета",
     ]
     ty = 197
     for item in toc_items:
@@ -1200,14 +1200,14 @@ def draw_section_banner(c, x, y, w, title, subtitle, accent):
     c.saveState()
     title_sz = 13.6
     sub_sz = 8.2
-    while title_sz > 9.4 and (
+    while title_sz > 7.4 and (
         pdfmetrics.stringWidth(title, "Cormorant-Bold", title_sz)
         + pdfmetrics.stringWidth(subtitle, "Lora-Italic", sub_sz)
         + 18
         > w
     ):
         title_sz -= 0.4
-        sub_sz = max(6.5, sub_sz - 0.22)
+        sub_sz = max(6.2, sub_sz - 0.22)
 
     c.setFont("Cormorant-Bold", title_sz)
     c.setFillColor(accent)
@@ -1481,7 +1481,7 @@ def build_page_6_index_and_regions(c, data):
     draw_section_banner(
         c, x, H_P - 66, w,
         "Сводный реестр персон альбома (22 персоны + 1 сиблинг + 3 узла IV к.)",
-        "Редакция 3.0 · Полный именной указатель",
+        "Редакция 4.0 · Полный именной указатель",
         FOREST_DEEP,
     )
 
@@ -1575,9 +1575,11 @@ def build_page_6_index_and_regions(c, data):
         c.setFillColor(acc)
         c.roundRect(rx, 54, 4, box_h, 2, stroke=0, fill=1)
 
-        next_y = draw_left_wrapped(c, reg["name"], rx + 9, 54 + box_h - 12, "PTSans-Bold", 7.6, col3_w - 15, 8.8, color=acc)
-        next_y = draw_left_wrapped(c, reg["admin"], rx + 9, next_y - 1, "PTSans-Italic", 6.5, col3_w - 15, 7.6, color=INK_MUTED)
-        draw_left_wrapped(c, reg["notes"], rx + 9, next_y - 3, "Lora-Regular", 6.7, col3_w - 15, 8.0, color=INK)
+        next_y = draw_left_wrapped(c, reg["name"], rx + 9, 54 + box_h - 11, "PTSans-Bold", 7.4, col3_w - 14, 8.5, color=acc)
+        next_y = draw_left_wrapped(c, reg["admin"], rx + 9, next_y - 0.5, "PTSans-Italic", 6.2, col3_w - 14, 7.2, color=INK_MUTED)
+        end_y = draw_left_wrapped(c, reg["notes"], rx + 9, next_y - 2.5, "Lora-Regular", 6.25, col3_w - 14, 7.35, color=INK)
+        if end_y < 54:
+            print(f"WARNING: clipped region card {reg['name']} (end_y={end_y:.1f})")
 
     c.restoreState()
     c.showPage()
@@ -1586,7 +1588,7 @@ def build_page_6_index_and_regions(c, data):
 def build_page_7_military_archives(c, data):
     draw_page_background(
         c, W_P, H_P, page_num=7, total_pages=TOTAL_PAGES,
-        header_title="Итоги поиска в «Вахте памяти» и военных архивах ЦАМО / ОБД «Мемориал»"
+        header_title="Итоги поиска в ЦАМО, ПМВ (1914.svrt.ru) и аудит ЗАГС / метрических / камеральных баз"
     )
 
     x = 34
@@ -1603,7 +1605,7 @@ def build_page_7_military_archives(c, data):
 
     # Card 1: Vasily Aleksandrovich Bunel
     cy = H_P - 80
-    h1 = 88
+    h1 = 84
     c.saveState()
     c.setFillColor(MATERNAL_BG)
     c.setStrokeColor(MATERNAL_BORDER)
@@ -1611,24 +1613,26 @@ def build_page_7_military_archives(c, data):
     c.roundRect(x, cy - h1, w, h1, 6, stroke=1, fill=1)
     c.setFillColor(MATERNAL_ACCENT)
     c.roundRect(x, cy - h1, 5, h1, 2, stroke=0, fill=1)
-    c.setFont("Cormorant-Bold", 11.8)
+    c.setFont("Cormorant-Bold", 11.6)
     c.setFillColor(INK)
-    c.drawString(x + 12, cy - 15, "Бунель Василий Александрович (1918 г.р.) — ПОДТВЕРЖДЕНО ПО ВПП ЦАМО")
-    c.setFont("PTSans-Bold", 7.3)
+    c.drawString(x + 12, cy - 14.5, "Бунель Василий Александрович (1918 г.р.) — ПОДТВЕРЖДЕНО ПО ВПП ЦАМО")
+    c.setFont("PTSans-Bold", 7.2)
     c.setFillColor(MATERNAL_ACCENT)
-    c.drawString(x + 12, cy - 26, "ОБД «Мемориал» ID 1986566671 · ЦАМО, ф. 8322, оп. 101476, д. 40 (Военно-пересыльные пункты)")
+    c.drawString(x + 12, cy - 25.5, "ОБД «Мемориал» ID 1986566671 · ЦАМО, ф. 8322, оп. 101476, д. 40 (Военно-пересыльные пункты)")
     body1 = (
-        "Место рождения: БССР, Барановичская обл., Клецкий р-н, д. Ефимовичи. Дата и место призыва: 13.10.1944 Клецким РВК. "
-        "Звание: рядовой. Направлен в 43-й запасный стрелковый полк 5-й запасной стрелковой дивизии (43 зсп 5 зсд), прибыл не ранее 26.10.1944. "
-        "Поскольку Западная Беларусь была под оккупацией с июня 1941 по июль 1944 г., Клецкий РВК призвал/провёл через ЗП уроженцев деревни осенью 1944 г. "
-        "(в тот же день призван и направлен в тот же полк его односельчанин Бунель Адам Иосифович). Данные 43 зсп дают ключ к установлению боевой части и обстоятельств плена."
+        "Место рождения: БССР, Барановичская обл., Клецкий р-н, д. Ефимовичи. Призван 13.10.1944 Клецким РВК, рядовой, "
+        "направлен в 43-й запасный стрелковый полк 5-й зсд (прибыл не ранее 26.10.1944). После освобождения Западной Беларуси "
+        "Клецкий РВК направил через ЗП уроженцев деревни (в тот же день в 43 зсп призван односельчанин Бунель Адам Иосифович). "
+        "Запрос в ЦАМО по 43 зсп даст ключ к точной боевой части и обстоятельствам плена."
     )
-    draw_left_wrapped(c, body1, x + 12, cy - 38, "Lora-Regular", 7.55, w - 22, 9.2, color=INK)
+    end1 = draw_left_wrapped(c, body1, x + 12, cy - 37.5, "Lora-Regular", 7.45, w - 22, 9.0, color=INK)
+    if end1 < cy - h1:
+        print(f"WARNING: clipped p7 card1 (end={end1:.1f}, min={cy - h1:.1f})")
     c.restoreState()
 
     # Card 2: Mikhail Petrovich Zakharevich
-    cy2 = cy - h1 - 10
-    h2 = 122
+    cy2 = cy - h1 - 9
+    h2 = 114
     c.saveState()
     c.setFillColor(PATERNAL_BG)
     c.setStrokeColor(PATERNAL_BORDER)
@@ -1636,33 +1640,38 @@ def build_page_7_military_archives(c, data):
     c.roundRect(x, cy2 - h2, w, h2, 6, stroke=1, fill=1)
     c.setFillColor(PATERNAL_ACCENT)
     c.roundRect(x, cy2 - h2, 5, h2, 2, stroke=0, fill=1)
-    c.setFont("Cormorant-Bold", 11.8)
+    t2 = "Захаревич Михаил Петрович (1917 — 23.10.1944) — НАЙДЕН В 2 ДЕЛАХ ЦАМО (НА СВЕРКУ)"
+    t2_sz = 11.4
+    while t2_sz > 8.6 and pdfmetrics.stringWidth(t2, "Cormorant-Bold", t2_sz) > (w - 22):
+        t2_sz -= 0.3
+    c.setFont("Cormorant-Bold", t2_sz)
     c.setFillColor(INK)
-    c.drawString(x + 12, cy2 - 15, "Захаревич Михаил Петрович (1917 — 23.10.1944) — НАЙДЕН В 2 ДЕЛАХ ЦАМО (НА СВЕРКУ С СЕМЬЁЙ)")
-    c.setFont("PTSans-Bold", 7.3)
+    c.drawString(x + 12, cy2 - 14.5, t2)
+    c.setFont("PTSans-Bold", 7.15)
     c.setFillColor(PATERNAL_ACCENT)
-    c.drawString(x + 12, cy2 - 26, "ОБД ID 1989449643 (ВПП 199 зсп: ф. 8495, оп. 76116, д. 23) и ID 4240927 / 504240927 (173 сд: ф. 58, оп. 18003, д. 301)")
+    c.drawString(x + 12, cy2 - 25.5, "ОБД ID 1989449643 (ВПП 199 зсп: ф. 8495, оп. 76116, д. 23) и ID 4240927 / 504240927 (173 сд: ф. 58, оп. 18003, д. 301)")
     body2 = (
         "1) В деле ВПП записан с опечаткой как Захарович Михаил Петрович, 1917 г.р., д. Б. Стиклево, сержант, прибыл 29.07.1944 в 199 зсп "
-        "от призывной комиссии капитана Лапина (вместе с односельчанином Хмызом Фёдором Даниловичем, 1918 г.р.). "
-        "2) В донесении о безвозвратных потерях 173 сд: Захаревич Михаил Петрович, 1917 г.р., дер. Б.-Стекольное [писарское искажение Б. Стиклево], "
-        "призван Минским РВК, красноармеец, убит 23.10.1944 (в день освобождения Сувалок!), первичное захоронение — Польша, Белостокское воев., Сувалкский пов., "
-        "д. Кшивулька, севернее 100 м. Деревня Кшивулька (Krzywólka) — ныне территория советского мемориального кладбища на ул. Миколая Рея в г. Сувалки! "
-        "Необходимо подтвердить у старших родных отчество («Петрович») и ориентировочный год рождения (1917); на скане листа ID 4240718 может быть вписана жена Нина Андреевна."
+        "от призывной комиссии к-на Лапина (вместе с односельчанином Хмызом Фёдором Даниловичем, 1918 г.р.). "
+        "2) В донесении 173 сд: Захаревич Михаил Петрович, 1917 г.р., дер. Б.-Стекольное [искажение Б. Стиклево], Минский РВК, красноармеец, "
+        "убит 23.10.1944 (в день взятия г. Сувалки!), первичное захоронение — Польша, Сувалкский пов., д. Кшивулька, 100 м сев. "
+        "(ныне воинское кладбище на ул. Миколая Рея в г. Сувалки). Необходимо сверить отчество «Петрович» и 1917 г.р.; на скане ID 4240718 может быть указана жена."
     )
-    draw_left_wrapped(c, body2, x + 12, cy2 - 38, "Lora-Regular", 7.55, w - 22, 9.3, color=INK)
+    end2 = draw_left_wrapped(c, body2, x + 12, cy2 - 37.5, "Lora-Regular", 7.45, w - 22, 9.0, color=INK)
+    if end2 < cy2 - h2:
+        print(f"WARNING: clipped p7 card2 (end={end2:.1f}, min={cy2 - h2:.1f})")
     c.restoreState()
 
-    # Section 2: Village candidates
-    s2_y = cy2 - h2 - 18
+    # Section 2: Village & regional candidates (5 blocks)
+    s2_y = cy2 - h2 - 17
     draw_section_banner(
         c, x, s2_y, w,
-        "2. Односельчане из д. Ефимовичи и д. Б. Стиклево",
-        "Кандидаты по ЦАМО (на сверку с родными, пока вне древа)",
+        "2. Односельчане и региональные зацепки (ЦАМО и ПМВ)",
+        "д. Ефимовичи, д. Б. Стиклево и Сафоновский р-н",
         GOLD,
     )
-    cand_top = s2_y - 12
-    cand_h = 216
+    cand_top = s2_y - 11
+    cand_h = 224
     c.saveState()
     c.setFillColor(GOLD_BG)
     c.setStrokeColor(GOLD)
@@ -1671,22 +1680,24 @@ def build_page_7_military_archives(c, data):
 
     yy = cand_top - 14
     for cand in leads["village_candidates"]:
-        c.setFont("PTSans-Bold", 7.8)
+        c.setFont("PTSans-Bold", 7.65)
         c.setFillColor(FOREST_DEEP)
         c.drawString(x + 11, yy, f"• {cand['name']} ({cand['birth_year']} г.р.) — {cand['place']}")
-        next_y = draw_left_wrapped(c, cand["details"], x + 18, yy - 10.6, "Lora-Regular", 7.55, w - 30, 9.2, color=INK)
-        yy = next_y - 6.0
+        next_y = draw_left_wrapped(c, cand["details"], x + 18, yy - 10.2, "Lora-Regular", 7.35, w - 30, 8.9, color=INK)
+        yy = next_y - 5.2
+    if yy + 5.2 < cand_top - cand_h:
+        print(f"WARNING: clipped p7 candidates (yy={yy:.1f}, min={cand_top - cand_h:.1f})")
     c.restoreState()
 
-    # Section 3: Negative/checked bases & manual steps
-    s3_y = cand_top - cand_h - 18
+    # Section 3: Audit of ZAGS, cameral & church databases (why open dates are absent)
+    s3_y = cand_top - cand_h - 17
     draw_section_banner(
         c, x, s3_y, w,
-        "3. Проверенные архивы без совпадений и план дальнейшего поиска",
-        "Что уже проверено и что проверить вручную",
+        "3. Аудит ЗАГС, церковных книг, камеральных фондов и открытых баз",
+        "Почему точные даты I–III поколений не открыты онлайн",
         MARUNOV_ACCENT,
     )
-    chk_top = s3_y - 12
+    chk_top = s3_y - 11
     chk_h = chk_top - 52
     c.saveState()
     c.setFillColor(CARD_BG)
@@ -1694,10 +1705,12 @@ def build_page_7_military_archives(c, data):
     c.setLineWidth(0.8)
     c.roundRect(x, 52, w, chk_h, 6, stroke=1, fill=1)
 
-    chk_y = chk_top - 14
+    chk_y = chk_top - 15
     for line in leads["checked_no_match"]:
-        next_y = draw_left_wrapped(c, f"— {line}", x + 11, chk_y, "Lora-Regular", 7.75, w - 22, 9.6, color=INK)
-        chk_y = next_y - 7.0
+        next_y = draw_left_wrapped(c, f"— {line}", x + 11, chk_y, "Lora-Regular", 7.65, w - 22, 9.4, color=INK)
+        chk_y = next_y - 6.5
+    if chk_y + 6.5 < 52:
+        print(f"WARNING: clipped p7 audit block (chk_y={chk_y:.1f})")
     c.restoreState()
 
     c.showPage()
@@ -1706,7 +1719,7 @@ def build_page_7_military_archives(c, data):
 def build_page_8_research_guide(c, data):
     draw_page_background(
         c, W_P, H_P, page_num=8, total_pages=TOTAL_PAGES,
-        header_title="План опроса родственников, архивный путеводитель и рабочая анкета"
+        header_title="Вопросы к родным, точные фонды НИАБ / ГАМн / ГАСО / ЗАГС и рабочая анкета"
     )
 
     x = 34
@@ -1722,69 +1735,74 @@ def build_page_8_research_guide(c, data):
 
     priorities = [
         ("Сверка находки по деду Михаилу Захаревичу и роду Хмыз (д. Б. Стиклево):",
-         "Подтвердить, что деда звали Захаревич Михаил Петрович (1917 г.р.). Не был ли Захаревич Иван Петрович (1899 г.р.) его старшим братом? Родня Хмыз: кто мать Нины Андреевны и кем приходятся Хмызы Фёдор Данилович (1918), Василий Фёдорович (1918), Виктор Фёдорович (1910) из Стиклево?"),
+         "Подтвердить отчество «Петрович» и 1917 г.р.; не был ли Захаревич Иван Петрович (1899 г.р.) его старшим братом? Кем приходятся Хмызы Фёдор Данилович (1918), Василий Фёдорович (1918), Виктор Фёдорович (1910)?"),
         ("Ветвь Бунель (д. Ефимовичи) и братья Василий, Иван, Владимир, Фёдор:",
-         "Спросить про односельчан-однофамильцев из 43 зсп — Бунеля Адама Иосифовича (1909–1945) и Константина Мартыновича (1913). Уточнить, в каком году Василий Александрович (1918 г.р.) впервые попал на фронт/в плен (до 1944 г. или после призыва 13.10.1944?), и судьбы братьев Ивана, Владимира и Фёдора."),
+         "Выяснить родство с односельчанами Бунель Адамом Иосифовичем (1909–1945) и Константином Мартыновичем (1913); год первого призыва/плена В. А. Бунеля (1918 г.р.) и даты жизни братьев Ивана, Владимира и Фёдора."),
         ("Ветвь Адамович (д. Ефимовичи и д. Счасновичи) и семья Винничек:",
-         "Как звали третьего (забытого) брата или сестру Марии Адамович, и какое отчество было у Марии и Николая? Где точно находилась д. Счасновичи (не д. Чановичи Несвижского р-на или д. Чаша Клецкого р-на?). Уточнить отчество Бориса Винничека, семьи Виталия, Дениса Бунель и Анатолия Винничека."),
+         "Имя забытого брата/сестры Марии Адамович, её отчество; уточнить локализацию «д. Счасновичи» (ср. д. Чановичи / д. Чаша), отчество Бориса Винничека, даты семей Виталия, Дениса Бунель и Анатолия Винничека."),
         ("Ветвь Марунов (г. Сафоново) и II брак Нины Андреевны:",
-         "Год заключения 2-го брака Нины Андреевны с И. А. Маруновым, его даты рождения/смерти и боевой путь (проверить награды и юбилейный орден 1985 г. на «Память народа» вручную), а также даты жизни и потомков Валерия и Николая Ивановичей Маруновых."),
+         "Год 2-го брака с И. А. Маруновым, его даты жизни (проверить награды на «Память Народа» вручную), даты Валерия и Николая Маруновых."),
     ]
 
-    py = H_P - 84
+    py = H_P - 82
     for title, desc in priorities:
         c.saveState()
         c.setFillColor(GOLD)
-        c.circle(x + 5, py - 3, 2.3, stroke=0, fill=1)
-        c.setFont("PTSans-Bold", 7.8)
+        c.circle(x + 5, py - 3, 2.2, stroke=0, fill=1)
+        c.setFont("PTSans-Bold", 7.55)
         c.setFillColor(FOREST_DEEP)
-        c.drawString(x + 13, py - 5.2, title)
-        next_y = draw_left_wrapped(c, desc, x + 13, py - 15.8, "Lora-Regular", 7.45, w - 16, 9.1, color=INK)
-        py = next_y - 4.5
+        c.drawString(x + 13, py - 5.0, title)
+        next_y = draw_left_wrapped(c, desc, x + 13, py - 14.5, "Lora-Regular", 7.15, w - 16, 8.5, color=INK)
+        py = next_y - 3.6
         c.restoreState()
 
-    # Block 2: Archival roadmap across Belarus, Poland & Smolensk
+    # Block 2: Exact archival fonds & ZAGS rules
     draw_section_banner(
-        c, x, py - 2, w,
-        "2. Архивные ориентиры (ЦАМО, РБ, Польша, РФ)",
-        "Куда обращаться за сканами и метриками до 1917 г.",
+        c, x, py - 5, w,
+        "2. Точный архивный путеводитель (церковные, камеральные, ЗАГС)",
+        "Шифры НИАБ, ГАМн, ГАСО и Закон РБ № 163-З",
         MATERNAL_ACCENT,
     )
-    ay = py - 15
-    box_h = 132
+    ay = py - 17
+    box_h = 196
     c.saveState()
     c.setFillColor(CARD_BG)
     c.setStrokeColor(MATERNAL_BORDER)
     c.setLineWidth(0.8)
     c.roundRect(x, ay - box_h, w, box_h, 6, stroke=1, fill=1)
 
-    archive_tips = [
-        ("Открытие полных сканов ЦАМО и поиск наград (РФ):",
-         "В ОБД «Мемориал» открыть лист донесения ID 4240718 (с. 35) для Захаревича М. П. (проверить графу «ближайший родственник» — там часто записана жена!). На «Память Народа» / «Подвиг Народа» (ручной ввод капчи) проверить награды и учётно-послужные карточки В. А. Бунеля (1918, 43 зсп), его братьев и И. А. Марунова."),
-        ("Архивы Беларуси (Минский, Клецкий и Несвижский р-ны, НИАБ):",
-         "ЗАГСы Минского (Новодворский с/с) и Клецкого (Кухчицкий с/с) р-нов; ЗГА в Молодечно и Барановичах (1921–1954 гг., повет Несвижский и Барановичская обл.). Метрики до 1917 г. — НИАБ (г. Минск): приход д. Замосточье (д. Б. Стиклево) и церкви Слуцкого уезда (д. Ефимовичи)."),
-        ("Польша (Польский Красный Крест / Сувалки) и Смоленск (ГАСО):",
-         "Справка в Польский Красный Крест (PCK) и администрацию г. Сувалки о перезахоронении из д. Кшивулька на воинское кладбище (ul. Mikołaja Reja). По линии Марунова И. А. (г. Сафоново) — ЗАГС г. Сафоново и дореволюционный архив ГАСО (г. Смоленск, Дорогобужский уезд)."),
-    ]
     ty = ay - 12
-    for head, body in archive_tips:
-        c.setFont("PTSans-Bold", 7.6)
+    for fond in data["archive_leads"]["archival_fonds"]:
+        c.setFont("PTSans-Bold", 7.45)
         c.setFillColor(MATERNAL_ACCENT)
-        c.drawString(x + 11, ty, head)
-        next_y = draw_left_wrapped(c, body, x + 11, ty - 10, "Lora-Regular", 7.25, w - 22, 8.8, color=INK)
-        ty = next_y - 4.5
+        c.drawString(x + 11, ty, f"• {fond['region']}:")
+        ny1 = draw_left_wrapped(c, f"Церкви/ревизии: {fond['church']}", x + 17, ty - 9.6, "Lora-Regular", 7.0, w - 28, 8.2, color=INK)
+        ny2 = draw_left_wrapped(c, f"Камеральные/ЗАГС: {fond['cameral_zags']}", x + 17, ny1 - 1.0, "Lora-Regular", 7.0, w - 28, 8.2, color=INK)
+        ty = ny2 - 4.2
+
+    c.setFont("PTSans-Bold", 7.45)
+    c.setFillColor(PATERNAL_ACCENT)
+    c.drawString(x + 11, ty, "• Порядок обращения в ЗАГС (РБ и РФ), ЦАМО и Польшу:")
+    zags_rule = (
+        "По Закону РБ № 163-З от 18.04.2022 (и ФЗ-143 РФ) акты ЗАГС хранятся 100 лет и выдаются только по заявлению родственников "
+        "с цепочкой свидетельств (Минский р-н, Клецкий р-н, облархив ЗАГС Минской обл., ЗАГС г. Сафоново). В ЦАМО/ОБД открыть скан "
+        "ID 4240718 (с. 35) по М. П. Захаревичу и проверить Польский Красный Крест (перезахоронение в г. Сувалки, ul. M. Reja)."
+    )
+    ny_end = draw_left_wrapped(c, zags_rule, x + 17, ty - 9.6, "Lora-Regular", 6.95, w - 28, 8.2, color=INK)
+    if ny_end < ay - box_h:
+        print(f"WARNING: clipped p8 archive box (ny_end={ny_end:.1f}, min={ay - box_h:.1f})")
     c.restoreState()
 
     # Block 3: Printable Interview Worksheet
-    wy = ay - box_h - 16
+    wy = ay - box_h - 15
     draw_section_banner(
         c, x, wy, w,
         "3. Рабочая таблица для записи сведений",
-        "Заполните от руки в беседе с родными или пришлите списком",
+        "Заполните от руки в беседе с родными или после ответа из ЗАГС / архивов",
         PATERNAL_ACCENT,
     )
 
-    table_top = wy - 13
+    table_top = wy - 12
     wcols = [
         ("ФИО (и девичья фамилия)", 168),
         ("Кем приходится", 96),
@@ -1793,16 +1811,16 @@ def build_page_8_research_guide(c, data):
     ]
     c.saveState()
     c.setFillColor(PATERNAL_ACCENT)
-    c.rect(x, table_top - 16, w, 16, stroke=0, fill=1)
+    c.rect(x, table_top - 15, w, 15, stroke=0, fill=1)
     cx_pos = x
-    c.setFont("PTSans-Bold", 7.3)
+    c.setFont("PTSans-Bold", 7.2)
     c.setFillColor(colors.white)
     for cname, cw in wcols:
-        c.drawString(cx_pos + 4, table_top - 11, cname)
+        c.drawString(cx_pos + 4, table_top - 10.5, cname)
         cx_pos += cw
 
-    row_y = table_top - 16
-    row_h = 20
+    row_y = table_top - 15
+    row_h = 18.5
     num_rows = max(4, int((row_y - 48) // row_h))
     for i in range(num_rows):
         c.setFillColor(CARD_BG if i % 2 == 0 else PARCHMENT)
@@ -1827,7 +1845,7 @@ def main():
     c = canvas.Canvas(str(OUT_PDF), pagesize=A4)
     c.setTitle(data["title"])
     c.setAuthor("Семейный архив Захаревич — Бунель")
-    c.setSubject("Генеалогическое древо, альбом и архивная справка ЦАМО (Редакция 3.0)")
+    c.setSubject("Генеалогическое древо, альбом и архивный аудит ЦАМО / НИАБ / ГАМн / ГАСО / ЗАГС (Редакция 4.0)")
 
     build_page_1_cover(c, data)
     c.setPageSize(landscape(A4))

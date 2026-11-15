@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+*.tmp
+tmp_pages*/
+preview_pages/

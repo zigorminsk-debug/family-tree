@@ -1,0 +1,61 @@
+name: Build Family Tree Album
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build and verify PDF album
+        run: |
+          python src/build_tree_pdf.py | tee /tmp/build.log
+          if grep -q "WARNING:" /tmp/build.log; then
+            echo "Layout warnings detected in build!"
+            exit 1
+          fi
+          python - <<'EOF'
+          import json
+          import pathlib
+          import pymupdf
+
+          data = json.loads(pathlib.Path("data/family_tree.json").read_text(encoding="utf-8"))
+          doc = pymupdf.open("Rodovoe_Drevo_Zaharevich_Bunel.pdf")
+          n_persons = len(data["persons"])
+          print(f"Verified PDF pages: {len(doc)}, persons: {n_persons}")
+          assert len(doc) == 8, f"Expected 8 pages, got {len(doc)}"
+          out_dir = pathlib.Path("preview_pages")
+          out_dir.mkdir(exist_ok=True)
+          for i, page in enumerate(doc):
+              page.get_pixmap(dpi=150).save(str(out_dir / f"page_{i+1}.png"))
+          EOF
+
+      - name: Upload PDF album artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rodovoe_Drevo_Zaharevich_Bunel
+          path: Rodovoe_Drevo_Zaharevich_Bunel.pdf
+          retention-days: 90
+
+      - name: Upload page preview PNGs
+        uses: actions/upload-artifact@v4
+        with:
+          name: album-page-previews
+          path: preview_pages/*.png
+          retention-days: 90
